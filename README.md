@@ -122,6 +122,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## The Storm Creator
+
+⚡ **Shivpujan Kumar** - The mad scientist who believed websites should be tested like they're going through a hurricane. While most developers pray their sites don't crash, he built a tool to simulate the storm and watch the chaos. If your site survives DeployProbe, it can probably survive the apocalypse too!
+
+When not brewing digital tempests to torture innocent websites, Shivpujan can be found reading server logs like they're poetry and explaining to non-technical friends that "No, turning it off and on again isn't always the solution... but it works surprisingly often."
+
 ## Acknowledgments
 
 - Built with Flask
