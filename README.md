@@ -20,7 +20,7 @@ DeployProbe helps you understand if your website is ready for high traffic situa
 ## How DeployProbe Works
 
 ```mermaid
-flowchart TD
+graph TD
     A[User enters website URL & target capacity] --> B[Initial site accessibility check]
     B -->|Site accessible| C[Parallel testing processes]
     B -->|Site inaccessible| H[Generate error report]
