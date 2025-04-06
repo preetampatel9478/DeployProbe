@@ -17,29 +17,38 @@ DeployProbe helps you understand if your website is ready for high traffic situa
 - **High concurrency testing**
 - **Scalability recommendations**
 
-## Deploying to Render
+## How DeployProbe Works
 
-### Option 1: One-Click Deploy
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
-
-### Option 2: Manual Deployment
-
-1. Fork or clone this repository
-2. Create a new Web Service in the Render Dashboard
-3. Connect your GitHub/GitLab repository
-4. Use the following settings:
-   - **Environment**: Python
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-5. Click "Create Web Service"
+```mermaid
+flowchart TD
+    A[User enters website URL & target capacity] --> B[Initial site accessibility check]
+    B -->|Site accessible| C[Parallel testing processes]
+    B -->|Site inaccessible| H[Generate error report]
+    
+    C --> D[Code quality analysis]
+    C --> E[Mobile responsiveness check]
+    C --> F[Content assessment]
+    C --> G[Page speed measurement]
+    
+    D --> I[High concurrency load test]
+    E --> I
+    F --> I
+    G --> I
+    
+    I --> J[Traffic simulation based on capacity]
+    J --> K[Analysis of response metrics]
+    K --> L[Generate scalability score]
+    L --> M[Produce final report]
+    
+    H --> M
+```
 
 ## Environment Variables
 
-The following environment variables can be set in your Render dashboard:
+The following environment variables can be set in your deployment environment:
 
 - `FLASK_DEBUG`: Set to "true" to enable debug mode (default: "false")
-- `PORT`: The port on which the application will run (default: 5000, but Render will set this automatically)
+- `PORT`: The port on which the application will run (default: 5000)
 
 ## Getting Started
 
