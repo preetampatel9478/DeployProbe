@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: deployprobe
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
+      - key: FLASK_DEBUG
+        value: false
+    healthCheckPath: /

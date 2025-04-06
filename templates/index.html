@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Metadata -->
+    <title>{{ meta.title }}</title>
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="keywords" content="{{ meta.keywords }}">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="{{ meta.title }}">
+    <meta property="og:description" content="{{ meta.description }}">
+    <meta property="og:image" content="{{ meta.og_image }}">
+    <meta property="og:url" content="{{ meta.canonical }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{{ meta.twitter_card }}">
+    <meta name="twitter:title" content="{{ meta.title }}">
+    <meta name="twitter:description" content="{{ meta.description }}">
+    <meta name="twitter:image" content="{{ meta.og_image }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ meta.canonical }}">
+    
+    {% if meta.get('noindex', False) %}
+    <meta name="robots" content="noindex, nofollow">
+    {% endif %}
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='img/fev.png') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/fev.png') }}" type="image/png">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Structured Data for Google -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "DeployProbe",
+        "description": "Test if your website can handle high traffic loads and analyze code quality for scalability.",
+        "applicationCategory": "WebDevelopment",
+        "operatingSystem": "All",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
+</head>
+<body class="homepage">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DeployProbe Logo" class="logo-img">
+                <span class="brand-text">DeployProbe</span>
+            </a>
+            <div class="navbar-text text-light d-none d-md-block">
+                {{ meta.title.split(' - ')[1] if ' - ' in meta.title else "Deployed it? Let's see if it survives the storm." }}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold">Will Your Deployment Survive The Storm?</h1>
+                    <p class="lead">Test if your website can handle thousands of users hitting it all at once</p>
+                </div>
+                
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h2 class="h4 mb-0"><i class="bi bi-lightning-charge me-2"></i>Start Testing</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if error %}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>{{ error }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        <form action="/test" method="POST" id="test-form">
+                            <div class="mb-4">
+                                <label for="url" class="form-label fw-bold">Deployment URL</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                    <input type="url" class="form-control" id="url" name="url" 
+                                        placeholder="https://your-project.vercel.app" required>
+                                </div>
+                                <div class="form-text">Include the full URL with https://</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="user_capacity" class="form-label fw-bold">
+                                    <i class="bi bi-people me-1"></i> Target User Capacity
+                                </label>
+                                <div class="capacity-selector">
+                                    <div class="d-flex">
+                                        <input type="range" class="form-range flex-grow-1 me-3" id="capacity-slider" 
+                                               min="1000" max="15000" step="1000" value="5000">
+                                        <div class="capacity-value-container">
+                                            <input type="number" class="form-control" id="user_capacity" name="user_capacity" 
+                                                   value="5000" min="1000" max="15000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="capacity-label mt-2 text-muted">
+                                        <small>1,000</small>
+                                        <small>5,000</small>
+                                        <small>10,000</small>
+                                        <small>15,000</small>
+                                    </div>
+                                    
+                                    <div class="preset-buttons mt-2 d-flex justify-content-between">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary preset-btn" data-value="1000">Low (1K)</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary preset-btn" data-value="5000">Medium (5K)</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary preset-btn" data-value="10000">High (10K)</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary preset-btn" data-value="15000">Extreme (15K)</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submit-btn">
+                                    <span>Test Project</span>
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="d-flex align-items-center mb-3 mt-4">
+                                <div class="flex-grow-1"><hr></div>
+                                <div class="px-3 text-muted">What We Test</div>
+                                <div class="flex-grow-1"><hr></div>
+                            </div>
+                            
+                            <!-- REORDERED - CODE QUALITY MOVED TO 2ND POSITION -->
+                            <div class="row g-4 text-center">
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-speedometer2"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Load Testing</h3>
+                                        <p class="small text-muted mb-0">Test how your site handles multiple concurrent users</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-code-square"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Code Quality</h3>
+                                        <p class="small text-muted mb-0">Analyze HTML structure and scalability best practices</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-lightning-charge"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Page Speed</h3>
+                                        <p class="small text-muted mb-0">Measure how quickly your page loads</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-4 text-center mt-0">
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Mobile Responsiveness</h3>
+                                        <p class="small text-muted mb-0">Check if your site adapts to mobile devices</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-layout-text-window"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Content Check</h3>
+                                        <p class="small text-muted mb-0">Verify your site has meaningful content</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="feature-item">
+                                        <div class="icon-circle bg-primary-light mb-3">
+                                            <i class="bi bi-check-circle"></i>
+                                        </div>
+                                        <h3 class="h6 fw-bold">Status Check</h3>
+                                        <p class="small text-muted mb-0">Confirm your server responds correctly</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="small text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        DeployProbe analyzes your website's capability to handle traffic storms while maintaining performance.
+                    </p>
+                </div>
+                
+                <!-- SEO Content -->
+                <div class="row mt-5 pt-4 border-top">
+                    <div class="col-md-6">
+                        <h2 class="h4">Don't Let Your Deployment Fail</h2>
+                        <p class="text-muted">Product launches, viral social media posts, or email campaigns can bring sudden traffic surges to your website. DeployProbe helps you:</p>
+                        <ul class="text-muted small">
+                            <li>Verify your site will stay up during traffic spikes</li>
+                            <li>Identify exactly how many users your deployment can handle</li>
+                            <li>Get actionable recommendations to weatherproof your site</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="h4">Ready for the Storm?</h2>
+                        <p class="text-muted">The worst time to discover your deployment can't handle traffic is when that traffic actually arrives. Don't let your site crash when it matters most.</p>
+                        <p class="text-muted small">DeployProbe simulates real-world traffic patterns and evaluates both server performance and code quality factors that impact how well your site weathers the storm.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">
+                        <strong>DeployProbe</strong> - Deployed it? Let's see if it survives the storm.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="text-muted mb-0">&copy; 2023 DeployProbe</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('test-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const capacitySlider = document.getElementById('capacity-slider');
+            const capacityInput = document.getElementById('user_capacity');
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            
+            // Sync slider with input
+            capacitySlider.addEventListener('input', function() {
+                capacityInput.value = this.value;
+                updatePresetButtons(this.value);
+            });
+            
+            capacityInput.addEventListener('input', function() {
+                capacitySlider.value = this.value;
+                updatePresetButtons(this.value);
+            });
+            
+            // Handle preset buttons
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    capacitySlider.value = value;
+                    capacityInput.value = value;
+                    updatePresetButtons(value);
+                });
+            });
+            
+            // Update active button state
+            function updatePresetButtons(value) {
+                presetBtns.forEach(btn => {
+                    if (btn.getAttribute('data-value') === value) {
+                        btn.classList.remove('btn-outline-secondary');
+                        btn.classList.add('btn-outline-primary');
+                    } else {
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-outline-secondary');
+                    }
+                });
+            }
+            
+            form.addEventListener('submit', function(e) {
+                // Change button to loading state
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Testing...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Metadata -->
+    <title>{{ meta.title }}</title>
+    <meta name="description" content="{{ meta.description }}">
+    <meta name="keywords" content="{{ meta.keywords }}">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="{{ meta.title }}">
+    <meta property="og:description" content="{{ meta.description }}">
+    <meta property="og:image" content="{{ meta.og_image }}">
+    <meta property="og:url" content="{{ meta.canonical }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="{{ meta.twitter_card }}">
+    <meta name="twitter:title" content="{{ meta.title }}">
+    <meta name="twitter:description" content="{{ meta.description }}">
+    <meta name="twitter:image" content="{{ meta.og_image }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ meta.canonical }}">
+    
+    {% if meta.get('noindex', False) %}
+    <meta name="robots" content="noindex, nofollow">
+    {% endif %}
+    
+    <link rel="icon" href="{{ url_for('static', filename='img/fev.png') }}" type="image/png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/fev.png') }}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    <!-- Structured Data for results -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "{{ meta.title }}",
+        "description": "{{ meta.description }}",
+        "author": {
+            "@type": "Organization",
+            "name": "DeployProbe"
+        },
+        "datePublished": "{{ test_progress[test_id].completed_at if test_id in test_progress and test_progress[test_id].completed_at is defined else now.isoformat() }}"
+    }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="DeployProbe Logo" class="logo-img">
+                <span class="brand-text">DeployProbe</span>
+            </a>
+            <div class="navbar-text text-light d-none d-md-block">
+                Deployed it? Let's see if it survives the storm.
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">Storm Report for <span class="text-primary">{{ url }}</span></h1>
+                <a href="/" class="btn btn-outline-primary">Test Another Site</a>
+            </div>
+            <hr>
+        </div>
+
+        <!-- Status Check -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Status Check</h2>
+                {% if status_check.success %}
+                    <span class="badge bg-success">PASSED</span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p>{{ status_check.message }}</p>
+                {% if status_check.status_code %}
+                    <div class="small">
+                        <strong>Status Code:</strong> 
+                        <span class="badge {% if status_check.success %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ status_check.status_code }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Code Quality section moved up to be 2nd -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Code Quality & Scalability</h2>
+                {% if code_quality.success and code_quality.scalability.high_traffic_ready %}
+                    <span class="badge bg-success">READY FOR HIGH TRAFFIC</span>
+                {% elif code_quality.success %}
+                    <span class="badge bg-warning">NEEDS OPTIMIZATION</span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if code_quality.success %}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="h6 mb-2">Code Quality Score</h3>
+                            <div class="progress mb-2" style="height: 12px;">
+                                <div class="progress-bar 
+                                    {% if code_quality.score >= 90 %}bg-success
+                                    {% elif code_quality.score >= 75 %}bg-info
+                                    {% elif code_quality.score >= 60 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    style="width: {{ code_quality.score }}%">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="small">{{ code_quality.score }}/100</span>
+                                <span class="small fw-bold">{{ code_quality.quality_level }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h6 mb-2">Scalability Score</h3>
+                            <div class="progress mb-2" style="height: 12px;">
+                                <div class="progress-bar 
+                                    {% if code_quality.scalability.score >= 90 %}bg-success
+                                    {% elif code_quality.scalability.score >= 75 %}bg-info
+                                    {% elif code_quality.scalability.score >= 60 %}bg-warning
+                                    {% else %}bg-danger{% endif %}" 
+                                    style="width: {{ code_quality.scalability.score }}%">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="small">{{ code_quality.scalability.score }}/100</span>
+                                <span class="small fw-bold">{{ code_quality.scalability.level }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scalability Issues -->
+                    {% if code_quality.scalability.issues %}
+                        <div class="mt-3">
+                            <h3 class="h6 mb-2">Scalability Issues</h3>
+                            <div class="alert alert-warning py-2">
+                                <ul class="mb-0 ps-3 small">
+                                    {% for issue in code_quality.scalability.issues %}
+                                        <li>{{ issue }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Optimization Checklist -->
+                    <h3 class="h6 mt-4 mb-2">High Traffic Optimization</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>Cache Headers</span>
+                                    <span class="badge rounded-pill {% if code_quality.meta.cache_headers %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if code_quality.meta.cache_headers %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>Content Compression</span>
+                                    <span class="badge rounded-pill {% if code_quality.meta.compression %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if code_quality.meta.compression %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>CDN Usage</span>
+                                    <span class="badge rounded-pill {% if code_quality.meta.cdn_detected %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if code_quality.meta.cdn_detected %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>Optimized Images</span>
+                                    {% set image_optimized = code_quality.meta.unoptimized_images == 0 or (code_quality.meta.total_images > 0 and code_quality.meta.unoptimized_images / code_quality.meta.total_images < 0.3) %}
+                                    <span class="badge rounded-pill {% if image_optimized %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if image_optimized %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>Minimal Inline Scripts</span>
+                                    <span class="badge rounded-pill {% if code_quality.meta.inline_scripts <= 2 %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if code_quality.meta.inline_scripts <= 2 %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                                    <span>Proper HTML Structure</span>
+                                    <span class="badge rounded-pill {% if not 'Improper HTML structure' in code_quality.issues %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if not 'Improper HTML structure' in code_quality.issues %}Yes{% else %}No{% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-danger">{{ code_quality.message }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Page Speed -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Page Speed Test</h2>
+                {% if page_speed.success %}
+                    <span class="badge {% if page_speed.load_time < 2 %}bg-success{% elif page_speed.load_time < 4 %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ page_speed.speed_rating }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if page_speed.success %}
+                    <div class="mb-3">
+                        <p>Page loaded in <strong>{{ "%.2f"|format(page_speed.load_time) }} seconds</strong></p>
+                        
+                        <div class="progress">
+                            {% if page_speed.load_time < 1 %}
+                                <div class="progress-bar bg-success" style="width: {{ page_speed.load_time * 25 }}%">{{ "%.2f"|format(page_speed.load_time) }}s</div>
+                            {% elif page_speed.load_time < 2 %}
+                                <div class="progress-bar bg-success" style="width: {{ page_speed.load_time * 25 }}%">{{ "%.2f"|format(page_speed.load_time) }}s</div>
+                            {% elif page_speed.load_time < 4 %}
+                                <div class="progress-bar bg-warning" style="width: {{ page_speed.load_time * 25 }}%">{{ "%.2f"|format(page_speed.load_time) }}s</div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" style="width: 100%">{{ "%.2f"|format(page_speed.load_time) }}s</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="small text-muted mt-2">
+                            <span class="fw-bold">Reference:</span> 
+                            &lt; 1s Excellent, 
+                            &lt; 2s Good, 
+                            &lt; 4s Average, 
+                            &gt; 4s Slow
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-danger">{{ page_speed.message }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- High Traffic Capacity Analysis - updated to show selected user capacity -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Storm Survival Analysis</h2>
+                {% if load_test.success and load_test.can_handle_target %}
+                    <span class="badge bg-success">SURVIVED THE STORM</span>
+                {% elif load_test.success %}
+                    <span class="badge bg-danger">CRASHED UNDER PRESSURE</span>
+                {% else %}
+                    <span class="badge bg-danger">TEST FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if load_test.success %}
+                    <div class="alert {% if load_test.can_handle_target %}alert-success{% else %}alert-warning{% endif %} mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="bi {% if load_test.can_handle_target %}bi-check-circle-fill{% else %}bi-exclamation-circle-fill{% endif %} fs-4"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="mb-1 fw-bold">
+                                    {% if load_test.can_handle_target %}
+                                        Your site can handle {{ '{:,}'.format(user_capacity) }} users!
+                                    {% else %}
+                                        Your site cannot handle {{ '{:,}'.format(user_capacity) }} users
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0 small">{{ load_test.capacity_message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body py-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div>Estimated Capacity:</div>
+                                        <div class="fw-bold">{{ "{:,}".format(load_test.estimated_capacity) }} users</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body py-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div>Capacity Rating:</div>
+                                        <div class="fw-bold 
+                                            {% if load_test.capacity_rating == 'Excellent' %}text-success
+                                            {% elif load_test.capacity_rating == 'Good' %}text-info
+                                            {% elif load_test.capacity_rating == 'Average' %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ load_test.capacity_rating }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- High Concurrency Test Results -->
+                    {% if high_concurrency_test and high_concurrency_test.success %}
+                    <h3 class="h6 mt-4 mb-3">High Concurrency Test Results</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body p-3">
+                                    <div class="small text-muted mb-1">Success Rate @ High Concurrency</div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar {% if high_concurrency_test.success_rate > 90 %}bg-success{% elif high_concurrency_test.success_rate > 70 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                            style="width: {{ high_concurrency_test.success_rate }}%">
+                                            {{ "%.1f"|format(high_concurrency_test.success_rate) }}%
+                                        </div>
+                                    </div>
+                                    <div class="small text-muted">
+                                        Concurrent Users Simulated: <strong>{{ high_concurrency_test.concurrency }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body p-3">
+                                    <div class="small text-muted mb-1">Response Under High Load</div>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(high_concurrency_test.avg_response_time) }}s</div>
+                                            <div class="small text-muted">Average</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(high_concurrency_test.p95_response_time) }}s</div>
+                                            <div class="small text-muted">95th %</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <h3 class="h6 mb-3">Throughput Analysis</h3>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0 pe-3 text-end" style="width: 180px;">
+                                <span class="fw-bold">{{ "%.2f"|format(load_test.requests_per_second) }}</span>
+                                <span class="text-muted small">reqs/sec</span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="progress" style="height: 10px;">
+                                    {% set rps_percent = (load_test.requests_per_second / 20) * 100 if load_test.requests_per_second < 20 else 100 %}
+                                    <div class="progress-bar" role="progressbar" style="width: {{ rps_percent }}%"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <span class="small text-muted">0</span>
+                                    <span class="small text-muted">5</span>
+                                    <span class="small text-muted">10</span>
+                                    <span class="small text-muted">15</span>
+                                    <span class="small text-muted">20+</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-danger">Unable to perform high traffic capacity test. The site may be unreachable.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Content Check -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Content Check</h2>
+                {% if content_check.success %}
+                    <span class="badge bg-success">PASSED</span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p>{{ content_check.message }}</p>
+                {% if content_check.content_size %}
+                    <div class="small">
+                        <strong>Content Size:</strong> {{ (content_check.content_size / 1024) | round(2) }} KB
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mobile Responsiveness -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Mobile Responsiveness</h2>
+                {% if mobile_check.success %}
+                    <span class="badge bg-success">PASSED</span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p>{{ mobile_check.message }}</p>
+                {% if mobile_check.viewport %}
+                    <div class="small">
+                        <strong>Viewport Meta:</strong> <code>{{ mobile_check.viewport }}</code>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Load Testing -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">Load Test Results</h2>
+                {% if load_test.success_count is defined %}
+                    <span class="badge {% if load_test.performance_rating == 'Excellent' %}bg-success
+                          {% elif load_test.performance_rating == 'Good' %}bg-success
+                          {% elif load_test.performance_rating == 'Fair' %}bg-warning
+                          {% else %}bg-danger{% endif %}">
+                        {{ load_test.performance_rating }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger">FAILED</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if load_test.success_count is defined %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6">Success Rate</h3>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar {% if load_test.success_rate > 90 %}bg-success{% elif load_test.success_rate > 70 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                            style="width: {{ load_test.success_rate }}%">
+                                            {{ "%.1f"|format(load_test.success_rate) }}%
+                                        </div>
+                                    </div>
+                                    <div class="small text-muted">
+                                        {{ load_test.success_count }} successful of {{ load_test.total_requests }} requests
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6">Response Time</h3>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(load_test.avg_response_time) }}s</div>
+                                            <div class="small text-muted">Average</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(load_test.min_response_time) }}s</div>
+                                            <div class="small text-muted">Min</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(load_test.max_response_time) }}s</div>
+                                            <div class="small text-muted">Max</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6">Request Throughput</h3>
+                                    <p class="mb-0">
+                                        <span class="h3 text-primary">{{ "%.2f"|format(load_test.requests_per_second) }}</span> 
+                                        <span class="text-muted">requests/second</span>
+                                    </p>
+                                    <div class="small text-muted mt-1">
+                                        Higher values indicate better server capacity
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h3 class="h6">Response Time Percentiles</h3>
+                                    <div class="d-flex justify-content-between">
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(load_test.p90_response_time) }}s</div>
+                                            <div class="small text-muted">90th</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="h5">{{ "%.2f"|format(load_test.p95_response_time) }}s</div>
+                                            <div class="small text-muted">95th</div>
+                                        </div>
+                                    </div>
+                                    <div class="small text-muted mt-1">
+                                        90% and 95% of requests were faster than these values
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h3 class="h6 alert-heading">Load Test Details</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-0 small">
+                                    <li>Total Requests: <strong>{{ load_test.total_requests }}</strong></li>
+                                    <li>Concurrency Level: <strong>{{ load_test.concurrency }}</strong></li>
+                                    <li>Failed Requests: <strong>{{ load_test.failed_count }}</strong></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                {% if load_test.status_codes %}
+                                    <div class="small">
+                                        <strong>Status Codes:</strong>
+                                        {% for code, count in load_test.status_codes.items() %}
+                                            <span class="badge {% if 200 <= code < 400 %}bg-success{% else %}bg-warning{% endif %} me-1">
+                                                {{ code }}: {{ count }}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if load_test.error_types %}
+                                    <div class="small mt-1">
+                                        <strong>Errors:</strong>
+                                        {% for error, count in load_test.error_types.items() %}
+                                            <span class="badge bg-danger me-1">{{ error }}: {{ count }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-danger">Unable to perform load test. The site may be unreachable.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Summary section - updated to reflect user's selected capacity -->
+        <div class="card shadow-sm mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">Final Storm Assessment</h2>
+            </div>
+            <div class="card-body">
+                {% if not status_check.success %}
+                    <p class="lead">We couldn't assess this site because it's not accessible.</p>
+                {% else %}
+                    <div class="text-center mb-4">
+                        {% if load_test.can_handle_target and code_quality.success and code_quality.scalability.high_traffic_ready %}
+                            <div class="display-6 text-success mb-3">Your deployment weathered the storm!</div>
+                            <p class="lead">Based on our tests, your site successfully handled {{ '{:,}'.format(user_capacity) }} users hitting it at once.</p>
+                        {% elif load_test.can_handle_target %}
+                            <div class="display-6 text-warning mb-3">Survived, but weakened</div>
+                            <p class="lead">Your site handled our {{ '{:,}'.format(user_capacity) }} user test, but code quality issues may cause problems in sustained storms.</p>
+                        {% else %}
+                            <div class="display-6 text-danger mb-3">Your deployment failed the storm test</div>
+                            <p class="lead">Your site would likely crash under a storm of {{ '{:,}'.format(user_capacity) }} concurrent users.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mt-4">
+                        <h3 class="h6">High Traffic Recommendations:</h3>
+                        <ul class="mb-0">
+                            {% if not code_quality.meta.cache_headers %}
+                                <li>Add proper cache headers to reduce server load for repeat visitors.</li>
+                            {% endif %}
+                            
+                            {% if not code_quality.meta.compression %}
+                                <li>Enable GZIP/Brotli compression to reduce bandwidth requirements.</li>
+                            {% endif %}
+                            
+                            {% if not code_quality.meta.cdn_detected %}
+                                <li>Use a CDN for static assets to improve global performance and reduce origin load.</li>
+                            {% endif %}
+                            
+                            {% if load_test.requests_per_second < 10 %}
+                                <li>Your server handles only {{ "%.1f"|format(load_test.requests_per_second) }} requests per second, which is insufficient for high traffic. Consider server upgrades or optimization.</li>
+                            {% endif %}
+                            
+                            {% if high_concurrency_test and high_concurrency_test.success_rate < 95 %}
+                                <li>Your site shows degraded performance under high concurrency ({{ "%.1f"|format(high_concurrency_test.success_rate) }}% success rate). Optimize server threading and connection handling.</li>
+                            {% endif %}
+                            
+                            {% if code_quality.meta.unoptimized_images > 3 %}
+                                <li>Optimize your images and specify dimensions to prevent layout shifts and improve loading efficiency.</li>
+                            {% endif %}
+                            
+                            {% if load_test.avg_response_time > 1.5 %}
+                                <li>Your average response time ({{ "%.2f"|format(load_test.avg_response_time) }}s) is too high for optimal high traffic handling. Target under 1 second.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Social sharing -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h5 mb-0"><i class="bi bi-share me-2"></i>Share This Storm Report</h2>
+            </div>
+            <div class="card-body">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="d-flex justify-content-around">
+                            <a href="https://twitter.com/intent/tweet?text={{ 'DeployProbe Storm Test: ' ~ url ~ ' ' ~ ('survived' if load_test.can_handle_target else 'crashed under') ~ ' a storm of ' ~ '{:,}'.format(user_capacity) ~ ' users' | urlencode }}&url={{ meta.canonical | urlencode }}" 
+                               target="_blank" class="btn btn-outline-primary">
+                                <i class="bi bi-twitter me-1"></i> Tweet
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ meta.canonical | urlencode }}&title={{ meta.title | urlencode }}&summary={{ meta.description | urlencode }}" 
+                               target="_blank" class="btn btn-outline-primary">
+                                <i class="bi bi-linkedin me-1"></i> LinkedIn
+                            </a>
+                            <a href="mailto:?subject={{ 'Storm Test Results: ' ~ url | urlencode }}&body={{ 'I tested ' ~ url ~ ' with DeployProbe and found it ' ~ ('survived' if load_test.can_handle_target else 'crashed under') ~ ' a storm of ' ~ '{:,}'.format(user_capacity) ~ ' concurrent users. Check the full storm report: ' ~ meta.canonical | urlencode }}" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-envelope me-1"></i> Email
+                            </a>
+                            <button onclick="navigator.clipboard.writeText('{{ meta.canonical }}'); this.innerHTML='<i class=\'bi bi-check-lg me-1\'></i> Copied'; setTimeout(() => this.innerHTML='<i class=\'bi bi-link-45deg me-1\'></i> Copy Link', 2000)" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-link-45deg me-1"></i> Copy Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <a href="/" class="btn btn-primary">Test Another Site</a>
+        </div>
+    </div>
+
+    <footer class="bg-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">
+                        <strong>DeployProbe</strong> - Deployed it? Let's see if it survives the storm.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="text-muted mb-0">&copy; 2023 DeployProbe</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

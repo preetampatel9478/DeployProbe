@@ -3,12 +3,13 @@ import requests
 import time
 import concurrent.futures
 import re
-from flask import Flask, render_template, request, jsonify, url_for
+from flask import Flask, render_template, request, jsonify, url_for, redirect
 from bs4 import BeautifulSoup
 import threading
 import uuid
 import json
 from datetime import datetime
+import logging
 
 app = Flask(__name__)
 
@@ -20,6 +21,13 @@ SITE_KEYWORDS = "load testing, website performance, high traffic, scalability te
 
 # Add a dictionary to store test progress
 test_progress = {}
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[logging.StreamHandler()]
+)
 
 def perform_load_test(url, num_requests=100, concurrency=10):
     """Simulate load testing with concurrent requests"""
@@ -671,5 +679,57 @@ def inject_now():
     """Inject the current datetime into all templates."""
     return {'now': datetime.now()}
 
+# Add 404 error handler
+@app.errorhandler(404)
+def page_not_found(e):
+    """Handle 404 errors with custom template"""
+    meta = {
+        'title': f"Page Not Found - {SITE_NAME}",
+        'description': "The page you're looking for doesn't exist or has been moved.",
+        'keywords': SITE_KEYWORDS,
+        'og_image': url_for('static', filename='img/logo.png', _external=True),
+        'twitter_card': 'summary',
+        'canonical': request.base_url,
+        'noindex': True
+    }
+    return render_template('404.html', meta=meta, site_name=SITE_NAME, site_tagline=SITE_TAGLINE), 404
+
+# Add a redirect for the Render health check
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Render"""
+    return jsonify({"status": "ok"}), 200
+
+# Clean up tests periodically to avoid memory leaks
+@app.before_request
+def cleanup_old_tests():
+    """Remove old test results to prevent memory leaks"""
+    now = datetime.now()
+    to_remove = []
+    
+    for test_id, test_data in test_progress.items():
+        # If test is completed and older than 1 hour or is running for more than 15 minutes
+        if 'completed_at' in test_data:
+            completed_time = datetime.fromisoformat(test_data['completed_at'])
+            if (now - completed_time).total_seconds() > 3600:  # 1 hour
+                to_remove.append(test_id)
+        elif 'started_at' in test_data:
+            started_time = datetime.fromisoformat(test_data['started_at'])
+            if (now - started_time).total_seconds() > 900:  # 15 minutes
+                to_remove.append(test_id)
+    
+    for test_id in to_remove:
+        test_progress.pop(test_id, None)
+
+# Adjust for environment variables set by Render
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Get port from environment variable (Render sets PORT automatically)
+    port = int(os.environ.get('PORT', 5000))
+    
+    # Debug mode should be off in production
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
+    app.logger.info(f"Starting DeployProbe on port {port} (debug={debug_mode})")
+    
+    # Use host='0.0.0.0' to bind to all interfaces
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
