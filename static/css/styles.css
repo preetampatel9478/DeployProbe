@@ -1,0 +1,456 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar styling */
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    font-size: 1.4rem;
+}
+
+.navbar-text {
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+/* Card styling */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+}
+
+/* Feature items */
+.feature-item {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.feature-item .icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: transform 0.2s;
+}
+
+.feature-item:hover .icon-circle {
+    transform: scale(1.1);
+}
+
+.feature-item .icon-circle i {
+    font-size: 24px;
+    color: #0d6efd;
+}
+
+.bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* Progress bar styling */
+.progress {
+    height: 25px;
+    font-weight: bold;
+    background-color: #e9ecef;
+    border-radius: 50px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 1s ease;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Testing stages */
+.testing-stages {
+    margin: 2rem 0;
+    gap: 0.5rem;
+}
+
+.testing-stage {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s;
+}
+
+.stage-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    opacity: 0.5;
+}
+
+.stage-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.stage-active {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.2);
+}
+
+.stage-active .stage-icon {
+    opacity: 1;
+    color: #0d6efd;
+}
+
+.stage-active .stage-text {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.stage-completed {
+    background-color: rgba(25, 135, 84, 0.1);
+    border-color: rgba(25, 135, 84, 0.2);
+}
+
+.stage-completed .stage-icon {
+    opacity: 1;
+    color: #198754;
+}
+
+.stage-completed .stage-icon i::before {
+    content: "\F633"; /* Bootstrap icon check-circle */
+}
+
+.stage-completed .stage-text {
+    color: #198754;
+    font-weight: 500;
+}
+
+/* Icons */
+.bi {
+    vertical-align: -0.125em;
+}
+
+.bi-check-circle-fill::before {
+    content: "✓";
+    color: #198754;
+}
+
+.bi-x-circle-fill::before {
+    content: "✕";
+    color: #dc3545;
+}
+
+/* Input styling */
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Load test visualizations */
+.load-test-visualization {
+    height: 120px;
+    position: relative;
+    margin-top: 1rem;
+}
+
+.load-line {
+    position: absolute;
+    bottom: 0;
+    width: 3px;
+    background-color: #0d6efd;
+    border-radius: 2px 2px 0 0;
+    transition: height 0.5s ease-in-out;
+}
+
+/* High traffic capacity visualizations */
+.capacity-indicator {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.capacity-bar {
+    position: absolute;
+    height: 100%;
+    background-image: linear-gradient(to right, #20c997, #0d6efd);
+    border-radius: 4px;
+    transition: width 1s ease-out;
+}
+
+.capacity-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+/* Scalability score display */
+.score-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.score-excellent {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.score-good {
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #0d6efd;
+}
+
+.score-average {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #fd7e14;
+}
+
+.score-poor {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+/* High load test indicator animation */
+@keyframes pulse-load {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.high-load-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    margin-right: 6px;
+    animation: pulse-load 1.5s infinite;
+}
+
+/* Enhanced progress bars */
+.enhanced-progress {
+    height: 12px;
+    overflow: hidden;
+    border-radius: 50px;
+}
+
+.enhanced-progress .progress-bar {
+    position: relative;
+    overflow: hidden;
+}
+
+.enhanced-progress .progress-bar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-image: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.15) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.15) 50%, 
+        rgba(255, 255, 255, 0.15) 75%, 
+        transparent 75%, 
+        transparent);
+    background-size: 1rem 1rem;
+    opacity: 0.3;
+}
+
+/* User capacity selector styling */
+.capacity-selector {
+    padding: 1rem;
+    background-color: rgba(13, 202, 240, 0.05);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid rgba(13, 202, 240, 0.2);
+}
+
+.capacity-value-container {
+    width: 100px;
+}
+
+.capacity-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+.preset-buttons {
+    gap: 0.5rem;
+}
+
+.preset-buttons .btn {
+    flex: 1;
+    transition: all 0.2s;
+}
+
+.preset-buttons .btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Target capacity badge */
+.target-capacity .badge {
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .feature-item .icon-circle {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .feature-item .icon-circle i {
+        font-size: 20px;
+    }
+}
+
+/* DeployProbe brand styles */
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    font-size: 1.4rem;
+}
+
+.navbar-text {
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+    font-size: 0.95rem;
+}
+
+/* Logo animation effect on homepage */
+@keyframes storm-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        color: #0dcaf0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+        color: #fd7e14;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        color: #0dcaf0;
+    }
+}
+
+.homepage .navbar-brand i {
+    animation: storm-pulse 3s infinite;
+}
+
+/* Storm-related visual elements */
+.badge.bg-success {
+    background-color: #20c997 !important;
+}
+
+.display-6.text-success {
+    color: #20c997 !important;
+}
+
+/* Add storm-themed background elements */
+.homepage:before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #0dcaf0, #fd7e14, #0dcaf0);
+    z-index: 1030;
+}
+
+/* User capacity selector - updated with storm theme */
+.capacity-selector {
+    padding: 1rem;
+    background-color: rgba(13, 202, 240, 0.05);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid rgba(13, 202, 240, 0.2);
+}
+
+.capacity-value-container {
+    width: 100px;
+}
+
+/* Logo styling */
+.logo-img {
+    height: 32px;
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Responsive adjustments for logo */
+@media (max-width: 768px) {
+    .logo-img {
+        height: 28px;
+    }
+}
+
+/* Animation for the logo on the homepage */
+.homepage .logo-img {
+    animation: storm-pulse 3s infinite;
+}
